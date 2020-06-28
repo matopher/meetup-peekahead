@@ -73,8 +73,10 @@ function displayEvents(events) {
   const html = onlineEvents.map(
     (event) => `
     <div>
-      <h3>${event.name} - ${event.group.name}</h3>
-      <p>${new Date(event.time).toDateString()}</p>
+      <a href="${event.link}">
+        <h3>${event.name} - ${event.group.name}</h3>
+      </a>
+      <strong>${moment(event.time).format('dddd, MMMM Do @ h:mm a')}</strong>
       <p>${event.description}</p>
       <a href="${event.link}">View Event &rarr;</a>
       <hr>
