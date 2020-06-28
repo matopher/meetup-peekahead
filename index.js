@@ -2,6 +2,7 @@ const baseEndpoint = 'https://api.meetup.com';
 const proxy = `https://cors-anywhere.herokuapp.com/`;
 const proUrlName = `Techlahoma`;
 const eventList = document.querySelector('.event-list');
+const copyButton = document.querySelector('#copyButton');
 
 function getParameterByName(name) {
   var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
@@ -78,5 +79,19 @@ function displayEvents(events) {
   );
   eventList.innerHTML += html;
 }
+
+function copyToClipboard() {
+  const el = document.createElement('textarea');
+  el.value = eventList.innerHTML;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+}
+
+copyButton.addEventListener('click', () => {
+  copyToClipboard();
+  document.querySelector('.alert').classList.remove('d-none');
+});
 
 fetchAndDisplay();

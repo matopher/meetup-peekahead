@@ -4,18 +4,43 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Meetup Peekahead</title>
-    <!-- <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" /> -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        background-color: #edf2f7;
+      }
+      .event-list,
+      .alert {
+        max-width: 770px;
+        margin: 0 auto;
+        margin-bottom: 1rem;
+      }
+    </style>
   </head>
   <body>
-    <h1>Upcoming Techlahoma Meetup Events</h1>
-    <div class="events"> </div>
+    <div class="container pt-5">
+      <div class="text-center pb-3 mb-5">
+        <h1 class="pb-1">Upcoming Techlahoma Meetup Events</h1>
+        <a
+          class="btn btn-outline-primary"
+          href="https://secure.meetup.com/oauth2/authorize?client_id=kc6j34efhsf8unm15aob195jvm&response_type=token&redirect_uri=https://techlahoma-peekahead.netlify.app/"
+          >👋 Sign in</a
+        >
 
-    <a
-      href="https://secure.meetup.com/oauth2/authorize?client_id=kc6j34efhsf8unm15aob195jvm&response_type=token&redirect_uri=https://techlahoma-peekahead.netlify.app/"
-      >Sign in</a
-    >
+        <button id="copyButton" class="btn btn-outline-primary">📋 Copy HTML to Clipboard</button>
+      </div>
 
-    <div class="event-list"> </div>
+      <div class="alert alert-success d-none" role="alert">
+        ✅ Copied to clipboard!
+      </div>
+
+      <div contenteditable class="event-list m-auto p-5 rounded bg-white"></div>
+    </div>
   </body>
   <script src="./index.js"></script>
 </html>
