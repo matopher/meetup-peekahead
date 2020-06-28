@@ -15,13 +15,24 @@ function getAccessToken() {
 async function fetchAndDisplay() {
   const token = getAccessToken();
 
-  // const groups = await getGroupsWithUpcomingEvent(token);
-  // console.log(groups);
+  const groups = await getGroupsWithUpcomingEvent(token);
+  console.log(groups);
 
-  const events = await getUpcomingEvents(token, 'FreeCodeCamp-Norman');
-  console.log(events);
+  groups.forEach((group) => {
+    async () => {
+      let urlName = group.urlName;
 
-  displayEvents(events);
+      let events = await getUpcomingEvents(token, urlName);
+      console.log(events);
+
+      displayEvents(events);
+    };
+  });
+
+  // const events = await getUpcomingEvents(token, 'FreeCodeCamp-Norman');
+  // console.log(events);
+
+  // displayEvents(events);
 }
 
 async function getGroupsWithUpcomingEvent(token) {
