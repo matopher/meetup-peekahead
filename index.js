@@ -15,41 +15,25 @@ function getAccessToken() {
 async function fetchAndDisplay() {
   const token = getAccessToken();
 
+  // const groups = await getGroupsWithUpcomingEvent(token);
+  // console.log(groups);
+
   const events = await getUpcomingEvents(token, 'FreeCodeCamp-Norman');
   console.log(events);
 
   displayEvents(events);
 }
 
-// async function fetchProGroups(token) {
-//   const res = await fetch(`${proxy}${baseEndpoint}/pro/${proUrlName}/groups`, {
-//     headers: new Headers({
-//       Authorization: `Bearer ${token}`,
-//     }),
-//   });
-//   const data = await res.json();
+async function getGroupsWithUpcomingEvent(token) {
+  const response = await fetch(`${proxy}${baseEndpoint}/pro/${proUrlName}/groups?upcoming_events_min=1`, {
+    headers: new Headers({
+      Authorization: `Bearer ${token}`,
+    }),
+  });
 
-//   // let groups = data.map((group) => {
-//   //   return group.urlname;
-//   // });
-//   let groups = ['FreeCodeCamp-Norman'];
-
-//   console.log('Groups list', groups);
-
-//   groups.forEach((group) => {
-//     console.log('current group', group);
-
-//     let upcoming = fetchGroupUpcomingEvents(token, group);
-
-//     return upcoming;
-
-//     // upcoming.forEach((event) => {
-//     //   console.log('name: ', event.name);
-//     // });
-//   });
-
-//   // return groups;
-// }
+  let groupData = await response.json();
+  return groupData;
+}
 
 async function getUpcomingEvents(token, groupUrlName) {
   let response = await fetch(`${proxy}${baseEndpoint}/${groupUrlName}/events?status=upcoming`, {
@@ -58,8 +42,8 @@ async function getUpcomingEvents(token, groupUrlName) {
     }),
   });
 
-  let data = await response.json();
-  return data;
+  let eventData = await response.json();
+  return eventData;
 }
 
 function displayEvents(events) {
