@@ -18,21 +18,17 @@ async function fetchAndDisplay() {
   const groups = await getGroupsWithUpcomingEvent(token);
   console.log(groups);
 
-  groups.forEach((group) => {
-    async () => {
-      let urlName = group.urlName;
+  for (group of groups) {
+    let urlName = group.urlname;
+    console.log(urlName);
 
+    async function getEventsByGroup() {
       let events = await getUpcomingEvents(token, urlName);
-      console.log(events);
-
-      displayEvents(events);
-    };
-  });
-
-  // const events = await getUpcomingEvents(token, 'FreeCodeCamp-Norman');
-  // console.log(events);
-
-  // displayEvents(events);
+      await displayEvents(events);
+      console.log(`Added new event!`, events);
+    }
+    getEventsByGroup();
+  }
 }
 
 async function getGroupsWithUpcomingEvent(token) {
@@ -47,11 +43,18 @@ async function getGroupsWithUpcomingEvent(token) {
 }
 
 async function getUpcomingEvents(token, groupUrlName) {
-  let response = await fetch(`${proxy}${baseEndpoint}/${groupUrlName}/events?status=upcoming`, {
-    headers: new Headers({
-      Authorization: `Bearer ${token}`,
-    }),
-  });
+  const daysAhead = 10;
+  let unformattedDate = new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000).setUTCHours(0, 0, 0, 0);
+  let noLaterThanDate = new Date(unformattedDate).toISOString().slice(0, -1);
+
+  let response = await fetch(
+    `${proxy}${baseEndpoint}/${groupUrlName}/events?status=upcoming&no_later_than=${noLaterThanDate}`,
+    {
+      headers: new Headers({
+        Authorization: `Bearer ${token}`,
+      }),
+    }
+  );
 
   let eventData = await response.json();
   return eventData;
@@ -60,17 +63,20 @@ async function getUpcomingEvents(token, groupUrlName) {
 function displayEvents(events) {
   console.log('creating events');
 
-  const html = events.map(
+  let onlineEvents = events.filter((event) => event.is_online_event === true);
+
+  const html = onlineEvents.map(
     (event) => `
     <div>
       <h3>${event.name} - ${event.group.name}</h3>
       <p>${new Date(event.time).toDateString()}</p>
       <p>${event.description}</p>
       <a href="${event.link}">View Event &rarr;</a>
+      <hr>
     </div>
     `
   );
-  eventList.innerHTML = html.join('');
+  eventList.innerHTML += html;
 }
 
 fetchAndDisplay();
