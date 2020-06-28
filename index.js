@@ -16,6 +16,10 @@ function getAccessToken() {
 async function fetchAndDisplay() {
   const token = getAccessToken();
 
+  if (token) {
+    document.querySelector('#sign-in').classList.add('d-none');
+  }
+
   const groups = await getGroupsWithUpcomingEvent(token);
   console.log(groups);
 
