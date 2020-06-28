@@ -1,6 +1,7 @@
-const baseEndpoint = 'https://api.meetup.com/';
+const baseEndpoint = 'https://api.meetup.com';
 const proxy = `https://cors-anywhere.herokuapp.com/`;
 const proUrlName = `Techlahoma`;
+const eventList = document.querySelector('.event-list');
 
 function getParameterByName(name) {
   var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
@@ -11,45 +12,70 @@ function getAccessToken() {
   return getParameterByName('access_token');
 }
 
-function boot() {
-  var token = getAccessToken();
+async function fetchAndDisplay() {
+  const token = getAccessToken();
 
-  // fetchSelf(token);
-  // fetchProGroups(token);
-  fetchGroupUpcomingEvents(token, 'FreeCodeCamp-Norman');
+  const events = await getUpcomingEvents(token, 'FreeCodeCamp-Norman');
+  console.log(events);
+
+  displayEvents(events);
 }
 
-async function fetchSelf(token) {
-  const res = await fetch(`${proxy}${baseEndpoint}/members/self`, {
+// async function fetchProGroups(token) {
+//   const res = await fetch(`${proxy}${baseEndpoint}/pro/${proUrlName}/groups`, {
+//     headers: new Headers({
+//       Authorization: `Bearer ${token}`,
+//     }),
+//   });
+//   const data = await res.json();
+
+//   // let groups = data.map((group) => {
+//   //   return group.urlname;
+//   // });
+//   let groups = ['FreeCodeCamp-Norman'];
+
+//   console.log('Groups list', groups);
+
+//   groups.forEach((group) => {
+//     console.log('current group', group);
+
+//     let upcoming = fetchGroupUpcomingEvents(token, group);
+
+//     return upcoming;
+
+//     // upcoming.forEach((event) => {
+//     //   console.log('name: ', event.name);
+//     // });
+//   });
+
+//   // return groups;
+// }
+
+async function getUpcomingEvents(token, groupUrlName) {
+  let response = await fetch(`${proxy}${baseEndpoint}/${groupUrlName}/events?status=upcoming`, {
     headers: new Headers({
       Authorization: `Bearer ${token}`,
     }),
   });
-  const data = await res.json();
-  console.log(data);
+
+  let data = await response.json();
   return data;
 }
 
-async function fetchProGroups(token) {
-  const res = await fetch(`${proxy}${baseEndpoint}/pro/${proUrlName}/groups`, {
-    headers: new Headers({
-      Authorization: `Bearer ${token}`,
-    }),
-  });
-  const data = await res.json();
-  console.log(data);
-  return data;
+function displayEvents(events) {
+  console.log('creating events');
+
+  const html = events.map(
+    (event) => `
+    <div>
+      <h3>${event.name} - ${event.group.name}</h3>
+      <p>${new Date(event.time).toDateString()}</p>
+      <p>${event.description}</p>
+      <a href="${event.link}">View Event &rarr;</a>
+    </div>
+    `
+  );
+  eventList.innerHTML = html.join('');
 }
 
-async function fetchGroupUpcomingEvents(token, groupUrlName) {
-  const res = await fetch(`${proxy}${baseEndpoint}/${groupUrlName}/events?status=upcoming`, {
-    headers: new Headers({
-      Authorization: `Bearer ${token}`,
-    }),
-  });
-  const data = await res.json();
-  console.log(data);
-  return data;
-}
-
-boot();
+fetchAndDisplay();
