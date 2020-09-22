@@ -31,16 +31,14 @@ async function fetchAndDisplay() {
     async function getEventsByGroup() {
       let events = await getUpcomingEvents(token, urlName, daysAhead);
 
-      // await displayEvents(events);
-
       await unsortedEvents.push(events);
-      console.log('updated ', unsortedEvents);
     }
     getEventsByGroup();
   }
 
   console.log('hold on...');
 
+  // This is a completely avoidable race condition. Ditch this later.
   await new Promise((resolve, reject) => setTimeout(resolve, 4000));
 
   console.log('resuming');
@@ -48,7 +46,6 @@ async function fetchAndDisplay() {
   let flattenedEvents = _.flatten(unsortedEvents);
 
   const sortedEvents = _.sortBy(flattenedEvents, ['time']);
-  console.log('sorted', sortedEvents);
 
   displayEvents(sortedEvents);
 }
@@ -101,6 +98,8 @@ function displayEvents(events) {
   );
 
   eventList.innerHTML += html;
+
+  scrubOrphanCommas();
 }
 
 function displayDaysAhead(daysAhead) {
@@ -123,6 +122,14 @@ copyButton.addEventListener('click', () => {
   copyToClipboard();
   document.querySelector('.alert').classList.remove('d-none');
 });
+
+function scrubOrphanCommas() {
+  eventList.childNodes.forEach((node) => {
+    if (node.nodeType === 3) {
+      node.remove();
+    }
+  });
+}
 
 displayDaysAhead(daysAhead);
 fetchAndDisplay();
