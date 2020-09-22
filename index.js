@@ -3,6 +3,7 @@ const proxy = `https://cors-anywhere.herokuapp.com/`;
 const proUrlName = `Techlahoma`;
 const eventList = document.querySelector('.event-list');
 const copyButton = document.querySelector('#copyButton');
+const daysAhead = 10;
 
 function getParameterByName(name) {
   var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
@@ -21,16 +22,14 @@ async function fetchAndDisplay() {
   }
 
   const groups = await getGroupsWithUpcomingEvent(token);
-  console.log(groups);
 
   for (group of groups) {
     let urlName = group.urlname;
-    console.log(urlName);
 
     async function getEventsByGroup() {
-      let events = await getUpcomingEvents(token, urlName);
+      let events = await getUpcomingEvents(token, urlName, daysAhead);
+
       await displayEvents(events);
-      console.log(`Added new event!`, events);
     }
     getEventsByGroup();
   }
@@ -47,13 +46,13 @@ async function getGroupsWithUpcomingEvent(token) {
   return groupData;
 }
 
-async function getUpcomingEvents(token, groupUrlName) {
-  const daysAhead = 10;
+async function getUpcomingEvents(token, groupUrlName, daysAhead) {
+  // const daysAhead = 10;
   let unformattedDate = new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000).setUTCHours(0, 0, 0, 0);
   let noLaterThanDate = new Date(unformattedDate).toISOString().slice(0, -1);
 
   let response = await fetch(
-    `${proxy}${baseEndpoint}/${groupUrlName}/events?status=upcoming&no_later_than=${noLaterThanDate}`,
+    `${proxy}${baseEndpoint}/${groupUrlName}/events?status=upcoming&no_later_than=${noLaterThanDate}&desc=true`,
     {
       headers: new Headers({
         Authorization: `Bearer ${token}`,
@@ -66,8 +65,6 @@ async function getUpcomingEvents(token, groupUrlName) {
 }
 
 function displayEvents(events) {
-  console.log('creating events');
-
   let onlineEvents = events.filter((event) => event.is_online_event === true);
 
   const html = onlineEvents.map(
@@ -86,6 +83,13 @@ function displayEvents(events) {
   eventList.innerHTML += html;
 }
 
+function displayDaysAhead(daysAhead) {
+  const daysText = document.querySelector('.days-ahead');
+  daysText.innerHTML = `Showing upcoming online events for the next <strong>${daysAhead} days</strong> until ${moment()
+    .add(daysAhead, 'days')
+    .format('dddd, MMMM Do')}.`;
+}
+
 function copyToClipboard() {
   const el = document.createElement('textarea');
   el.value = eventList.innerHTML;
@@ -100,4 +104,5 @@ copyButton.addEventListener('click', () => {
   document.querySelector('.alert').classList.remove('d-none');
 });
 
+displayDaysAhead(daysAhead);
 fetchAndDisplay();
