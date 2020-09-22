@@ -23,16 +23,34 @@ async function fetchAndDisplay() {
 
   const groups = await getGroupsWithUpcomingEvent(token);
 
+  const unsortedEvents = [];
+
   for (group of groups) {
     let urlName = group.urlname;
 
     async function getEventsByGroup() {
       let events = await getUpcomingEvents(token, urlName, daysAhead);
 
-      await displayEvents(events);
+      // await displayEvents(events);
+
+      await unsortedEvents.push(events);
+      console.log('updated ', unsortedEvents);
     }
     getEventsByGroup();
   }
+
+  console.log('hold on...');
+
+  await new Promise((resolve, reject) => setTimeout(resolve, 4000));
+
+  console.log('resuming');
+
+  let flattenedEvents = _.flatten(unsortedEvents);
+
+  const sortedEvents = _.sortBy(flattenedEvents, ['time']);
+  console.log('sorted', sortedEvents);
+
+  displayEvents(sortedEvents);
 }
 
 async function getGroupsWithUpcomingEvent(token) {
@@ -61,6 +79,7 @@ async function getUpcomingEvents(token, groupUrlName, daysAhead) {
   );
 
   let eventData = await response.json();
+  console.log(eventData);
   return eventData;
 }
 
@@ -80,6 +99,7 @@ function displayEvents(events) {
     </div>
     `
   );
+
   eventList.innerHTML += html;
 }
 
