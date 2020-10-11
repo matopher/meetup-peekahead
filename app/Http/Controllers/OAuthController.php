@@ -9,8 +9,8 @@ class OAuthController extends Controller
 {
     public function redirect() {
         $queries = http_build_query([
-            'client_id' => 'a9da6btrmilu2l48g43pl3pi99',
-            'redirect_uri' => 'https://tolocalhost.com/oauth/callback',
+            'client_id' => config('services.meetup.client_id'),
+            'redirect_uri' => config('services.meetup.redirect_uri'),
             'response_type' => 'code',
         ]);
 
