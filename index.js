@@ -39,7 +39,7 @@ async function fetchAndDisplay() {
   console.log('hold on...');
 
   // This is a completely avoidable race condition. Ditch this later.
-  await new Promise((resolve, reject) => setTimeout(resolve, 4000));
+  await new Promise((resolve, reject) => setTimeout(resolve, 8000));
 
   console.log('resuming');
 
