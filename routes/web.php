@@ -32,6 +32,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 
 Route::get('/events', [EventsController::class, 'index'])->name('events');
 Route::get('/events/groups', [EventsController::class, 'getGroupWithUpcomingEvents']);
+Route::get('/events/upcoming', [EventsController::class, 'upcoming']);
 
 Route::get('/oauth/redirect', [OAuthController::class, 'redirect']);
 Route::get('/oauth/callback', [OAuthController::class, 'callback']);
