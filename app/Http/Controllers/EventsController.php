@@ -34,6 +34,10 @@ class EventsController extends Controller
        return $events;
     }
 
+    public function groups() {
+       return $this->getGroupWithUpcomingEvents(); 
+    }
+
     private function getUpcomingEvents($groups) {
         $now = Carbon::now();
 
@@ -44,15 +48,19 @@ class EventsController extends Controller
         $events = collect([]);
 
         foreach ($groups as $group) {
-            $response = Http::withHeaders([
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . auth()->user()->token->access_token
-            ])->get("https://api.meetup.com/${group}/events?status=upcoming&no_later_than=${formatted_date}&desc=true");
-        
+            try {
+                $response = Http::withHeaders([
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer ' . auth()->user()->token->access_token
+                ])->get("https://api.meetup.com/${group}/events?status=upcoming&no_later_than=${formatted_date}&desc=true");
 
-            $new_event = $response->json();
-    
-            $events->push($new_event);
+                $new_event = $response->json();
+        
+                $events->push($new_event);
+
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
         }
 
         return $events;
@@ -62,14 +70,18 @@ class EventsController extends Controller
         $groups = [];
 
         if(auth()->user()->token) {
-            $response = Http::withHeaders([
-                'Accept'  => 'application/json',
-                'Authorization' => 'Bearer ' . auth()->user()->token->access_token
-                ])->get("https://api.meetup.com/pro/Techlahoma/groups?upcoming_events_min=1");
 
-            if ($response->status() === 200) {
+            try {
+                $response = Http::withHeaders([
+                    'Accept'  => 'application/json',
+                    'Authorization' => 'Bearer ' . auth()->user()->token->access_token
+                    ])->get("https://api.meetup.com/pro/Techlahoma/groups?upcoming_events_min=1");
+
                 $groups = collect($response->json())->pluck('urlname')->all();
+            } catch (\Exception $e) {
+                return $e->getMessage();
             }
+
         }
 
         return $groups;
